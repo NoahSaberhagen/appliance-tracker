@@ -46,3 +46,13 @@ app.post('/appliances/create', async (req, res) => {
     console.error(e)
   }
 })
+
+app.get('/appliances/list', async (_req, res) => {
+  try {
+    const appliances = await Appliance.find()
+    console.log(appliances);
+    res.json(JSON.stringify(appliances))
+  } catch (e) {
+    console.error(e)
+  }
+})

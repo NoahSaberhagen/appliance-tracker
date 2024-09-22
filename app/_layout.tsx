@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList } from 'react-native';
+import { useAppliance } from './hooks/useAppliance';
+import { styles } from './styles'
 
 const Form = () => {
+  const { listAppliances } = useAppliance();
+
+  const [appliances, setAppliances] = useState<any[]>([])
   const [formData, setFormData] = useState({
     applianceName: '',
   });
+
+  const handleListAppliances = async () => {
+    try {
+      const appliancesRes = await listAppliances();
+      if (!appliancesRes) {
+        console.error('no response')
+      } else {
+        setAppliances(appliancesRes)
+        console.log(appliances)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const handleSubmit = async () => {
     try {
@@ -32,32 +51,19 @@ const Form = () => {
         onChangeText={(text) => setFormData({ ...formData, applianceName: text })}
       />
       <Button title="Submit" onPress={handleSubmit} />
+      <Button title="List Appliances" onPress={async () => {
+        await handleListAppliances()
+      }} />
+      <FlatList 
+        data={appliances}
+        renderItem={({item, index}) => {
+          return (
+            <Text key={index}>{JSON.stringify(item)}</Text>
+          )
+        }}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    marginBottom: 10,
-  },
-  error: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 5,
-  },
-});
 
 export default Form;
