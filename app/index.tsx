@@ -2,8 +2,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { registerRootComponent } from 'expo';
-import HomeScreen from './home';
 import ProfileScreen from './profile';
+import HomeScreen from './home';
 
 const Tab = createBottomTabNavigator();
 

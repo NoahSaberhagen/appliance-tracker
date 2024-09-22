@@ -1,67 +1,61 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import { useAppliance } from '../hooks/useAppliance';
-import { styles } from '../styles'
+import React, { useEffect, useState, Modal } from 'react';
+import { View, Text, Button, FlatList } from 'react-native';
+import { styles } from '../styles';
+
+const userId = '66ef598547f2e06e89372ff1';
+
+function CreateGroupButton() {
+  const handlePress = async () => {}
+
+  return (
+    <View style={styles.rectangle}>
+      <Button title='Create Group' onPress={handlePress} />
+    </View>
+  )
+}
 
 export default function HomeScreen() {
-  const { listAppliances } = useAppliance();
+  const [userGroupNames, setUserGroupNames] = useState([])
 
-  const [appliances, setAppliances] = useState<any[]>([])
-  const [formData, setFormData] = useState({
-    applianceName: '',
-  });
+  useEffect(() => {
+    async function getUserGroups() {
+      try {
+        const res = await fetch(`http://localhost:5001/groups/find/${userId}`, {
+          method: 'GET',
+        })
+          .then((res) => res.json())
 
-  const handleListAppliances = async () => {
-    try {
-      const appliancesRes = await listAppliances();
-      if (!appliancesRes) {
-        console.error('no response')
-      } else {
-        setAppliances(appliancesRes)
-        console.log(appliances)
+        const groupNames = res.map((group) => {
+          return group["name"]
+        })
+
+        console.log('succesfully found groups: ' + JSON.stringify(groupNames))
+        setUserGroupNames(groupNames)
+      } catch (e) {
+        console.error(e)
       }
-    } catch (e) {
-      console.error(e)
     }
-  }
 
-  const handleSubmit = async () => {
-    try {
-      await fetch('http://localhost:5001/appliances/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: formData.applianceName })
-      })
-      console.log('created')
-      setFormData({ applianceName: '' })
-    } catch (e) {
-      console.error(e)
-    }
-  }
+    getUserGroups()
+  }, [])
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Form</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Appliance Name"
-        value={formData.applianceName}
-        onChangeText={(text) => setFormData({ ...formData, applianceName: text })}
-      />
-      <Button title="Submit" onPress={handleSubmit} />
-      <Button title="List Appliances" onPress={async () => {
-        await handleListAppliances()
-      }} />
-      <FlatList 
-        data={appliances}
-        renderItem={({item, index}) => {
-          return (
-            <Text key={index}>{JSON.stringify(item)}</Text>
-          )
-        }}
-      />
+      <Text style={styles.title}>Welcome, user!</Text>
+      <Text>This is where the groups will be displayed</Text>
+      <View style={styles.container}>
+        <FlatList 
+          data={userGroupNames}
+          renderItem={({item, index}) => {
+            return (
+              <View key={index} style={styles.rectangle}>
+                <Text>{item}</Text>
+              </View>
+            )
+          }}
+        />  
+      </View>
+      <CreateGroupButton />
     </View>
-  );
-};
+  )
+}

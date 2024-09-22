@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { Appliance } from './db/models';
+import { Appliance, UserGroup } from './db/models';
 import { IAppliance } from './db/types';
 import 'dotenv/config';
 
@@ -54,5 +54,51 @@ app.get('/appliances/list', async (_req, res) => {
     res.json(JSON.stringify(appliances))
   } catch (e) {
     console.error(e)
+  }
+})
+
+app.post('/groups/create', async (req, res) => {
+  const { name, userId } = req.body
+
+  switch (true) {
+    case !name:
+      console.error('no name provided')
+      break
+    case !userId:
+      console.error('no userId provided')
+      break
+    default:
+      break
+  }
+
+  try {
+    const group = new UserGroup({
+      name,
+      users: [userId]
+    })
+
+    await group.save()
+    console.log(`created group called: ${name}`)
+    res.sendStatus(200)
+  } catch (e) {
+    console.error(e)
+  }
+})
+
+app.get('/groups/find/:userId', async (req, res) => {
+  const { userId } = req.params
+
+  if (!userId) {
+    console.error('no userId provided')
+  } else {
+    try {
+      const groups = await UserGroup.find({
+        users: { $in: [userId] }
+      })
+      console.log(groups)
+      res.json(groups)
+    } catch (e) {
+      console.error(e)
+    }
   }
 })
