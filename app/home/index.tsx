@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import { useAppliance } from './hooks/useAppliance';
-import { styles } from './styles'
+import { useAppliance } from '../hooks/useAppliance';
+import { styles } from '../styles'
 
-const Form = () => {
+export default function HomeScreen() {
   const { listAppliances } = useAppliance();
 
   const [appliances, setAppliances] = useState<any[]>([])
@@ -65,5 +65,3 @@ const Form = () => {
     </View>
   );
 };
-
-export default Form;
