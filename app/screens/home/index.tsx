@@ -1,8 +1,6 @@
-import React, { useEffect, useState, Modal } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, FlatList } from 'react-native';
-import { styles } from '../styles';
-
-const userId = '66ef598547f2e06e89372ff1';
+import { styles } from '../../styles';
 
 function CreateGroupButton() {
   const handlePress = async () => {}

@@ -1,8 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { Appliance, UserGroup } from './db/models';
-import { IAppliance } from './db/types';
+import { Appliance, User, UserGroup } from './db/models';
+import { IAppliance, IUser } from './db/types';
 import 'dotenv/config';
 
 const app = express();
@@ -25,13 +25,37 @@ app.listen(port, async () => {
   }
 })
 
-app.use(bodyParser.json())
+// Users
+app.post('/users/create/:email/:username', async (req, res) => {
+  const { email, username } = req.params;
 
-app.post('/appliances/create', async (req, res) => {
-  const { name } = req.body
+  if (!email || !username) {
+    console.error('missing properties for user')
+  }
+
+  const user = new User<IUser>({
+    username,
+    email,
+    userGroups: []
+  })
+
+  try {
+    await user.save()
+    console.log('user created')
+    res.sendStatus(200)
+  } catch (e) {
+    console.error(e)
+    res.sendStatus(400)
+  }
+})
+
+// Appliances
+app.post('/appliances/create/:name', async (req, res) => {
+  const { name } = req.params
 
   if (!name) {
-    throw new Error('invalid request')
+    console.error('missing property for appliance')
+    res.sendStatus(400)
   }
 
   const appliance = new Appliance<IAppliance>({
@@ -40,48 +64,11 @@ app.post('/appliances/create', async (req, res) => {
 
   try {
     await appliance.save()
-    console.log('appliance created succesfully')
-    res.send(200)
-  } catch (e) {
-    console.error(e)
-  }
-})
-
-app.get('/appliances/list', async (_req, res) => {
-  try {
-    const appliances = await Appliance.find()
-    console.log(appliances);
-    res.json(JSON.stringify(appliances))
-  } catch (e) {
-    console.error(e)
-  }
-})
-
-app.post('/groups/create', async (req, res) => {
-  const { name, userId } = req.body
-
-  switch (true) {
-    case !name:
-      console.error('no name provided')
-      break
-    case !userId:
-      console.error('no userId provided')
-      break
-    default:
-      break
-  }
-
-  try {
-    const group = new UserGroup({
-      name,
-      users: [userId]
-    })
-
-    await group.save()
-    console.log(`created group called: ${name}`)
+    console.log('appliance created')
     res.sendStatus(200)
   } catch (e) {
     console.error(e)
+    res.sendStatus(500)
   }
 })
 
