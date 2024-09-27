@@ -1,19 +1,17 @@
 import { StyleSheet } from 'react-native';
-
-export const colors = {
-  black: '#051923',
-  white: '#EEF0F2'
-}
+import { colors } from './colors';
 
 export const styles = StyleSheet.create({
-  rectangle: {
-    height: 40,
-    width: 'auto',
-    borderWidth: 2,
-    borderRadius: 2,
+  main: {
+    backgroundColor: colors.white,
+    display: 'flex',
+    height: '100%',
+    flex: 1,
+    flexDirection: 'column'
   },
   container: {
     padding: 20,
+    color: colors.black,
     margin: 'auto'
   },
   title: {

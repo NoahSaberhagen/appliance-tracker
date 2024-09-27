@@ -1,7 +1,8 @@
 import React from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { View, Text } from 'react-native';
-import { styles } from '@/app/styles';
+import { navigation } from '@react-navigation/native';
+import { loginStyle } from '@/app/styles/login-style';
 
 export default function LoginScreen() {
   const handleLogin = async () => {
@@ -14,35 +15,51 @@ export default function LoginScreen() {
       });
 
       if (!credential) {
-        console.error('no credentials')
+        throw new Error('sign in failed')
       }
 
       const { email, fullName } = credential
 
-      let username: string;
-
-      if (!fullName) {
-        username = 'foo'
-      } else {
-        username = fullName.givenName + ' ' + fullName.familyName
+      // placeholder
+      if (!email || !fullName?.familyName || !fullName.givenName) {
+        throw new Error('missing credentials')
       }
 
-      await fetch(`http://localhost:5001/users/create/${email}/${username}`, {
-        method: 'POST'
+      const username = fullName?.givenName + ' ' + fullName?.familyName;
+      const body = JSON.stringify({ email, username })
+
+      console.log(body);
+
+      const res = await fetch(`http://localhost:5001/user/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body
       })
+
+      if (res.status === 200) {
+        navigation.navigate('/home')
+      } else {
+        throw new Error(JSON.stringify({
+          status: res.status,
+          message: res.body
+        }))
+      }
     } catch (e) {
       console.error(e)
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text>Login</Text>
+    <View style={loginStyle.main}>
+      <Text style={loginStyle.title}>Welcome to Appliance Tracker!</Text>
+      <Text style={loginStyle.description}>Login or sign up below.</Text>
       <AppleAuthentication.AppleAuthenticationButton
         buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
         buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
         cornerRadius={10}
-        style={styles.container}
+        style={loginStyle.appleButton}
         onPress={handleLogin}
       />
     </View>

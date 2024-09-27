@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList } from 'react-native';
 import { useAppliance } from '../../hooks/useAppliance';
-import { styles } from '../../styles'
+import { styles } from '../../styles/styles'
 
 export default function GroupScreen() {
   const { listAppliances } = useAppliance();
